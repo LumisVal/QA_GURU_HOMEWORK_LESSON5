@@ -1,8 +1,12 @@
 import pytest
 from selene import browser, by, be, have, command
 
-
 def test_fill_and_submit_form():
+    # Подготовка: создаём пустой файл для загрузки
+    file_name = 'test.png'
+    with open(file_name, 'wb') as f:
+        f.write(b'')
+
     # Открыть страницу с формой
     browser.open('/automation-practice-form')
 
@@ -23,9 +27,6 @@ def test_fill_and_submit_form():
     browser.element('.react-datepicker__month-select').click()
     browser.element('[value="8"]').click()
     browser.element('.react-datepicker__day--028').click()
-
-    # Выбрать предмет (например, Maths)
-    browser.element('#subjectsInput').type('Maths').press_enter()
 
     # Выбрать хобби (Sports и Reading)
     browser.element('[for="hobbies-checkbox-1"]').click()
