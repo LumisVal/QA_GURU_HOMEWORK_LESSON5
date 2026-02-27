@@ -28,6 +28,9 @@ def test_fill_and_submit_form():
     browser.element('[value="8"]').click()
     browser.element('.react-datepicker__day--028').click()
 
+    # Предметы (Maths)
+    browser.element('#subjectsInput').type('Maths').press_enter()
+
     # Выбрать хобби (Sports и Reading)
     browser.element('[for="hobbies-checkbox-1"]').click()
     browser.element('[for="hobbies-checkbox-2"]').click()
