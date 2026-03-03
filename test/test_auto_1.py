@@ -37,7 +37,7 @@ def test_fill_and_submit_form():
     # Загрузка файла
     browser.element('#uploadPicture').type(file_name)
 
-    # Выбрать штат (например, Rajasthan)
+    # Выбрать штат (например,  Rajasthan)
     browser.element('#state').click()
     browser.element(by.text('Rajasthan')).click()
 
