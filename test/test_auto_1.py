@@ -28,15 +28,14 @@ def test_fill_and_submit_form():
     browser.element('[value="8"]').click()
     browser.element('.react-datepicker__day--028').click()
 
-    # Выбрать предмет (например, Maths)
-    browser.element('#subjectsInput').type('Maths').press_enter()
-
     # Выбрать хобби (Sports и Reading)
     browser.element('[for="hobbies-checkbox-1"]').click()
     browser.element('[for="hobbies-checkbox-2"]').click()
 
     # Заполнить текущий адрес
     browser.element('#currentAddress').type('88 Colin P. Kelly Jr. Street.San Francisco')
+    # Загрузка файла
+    browser.element('#uploadPicture').type(file_name)
 
     # Выбрать штат (например, Rajasthan)
     browser.element('#state').click()
