@@ -19,4 +19,3 @@ def browser_management():
 
     browser.quit()
 
-    browser.quit()
