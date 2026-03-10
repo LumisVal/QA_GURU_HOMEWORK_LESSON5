@@ -10,14 +10,12 @@ def browser_management():
 
     driver = webdriver.Chrome(options=options)
     browser.config.driver = driver
-    yield driver
-    browser.config.driver = driver
+    browser.config.base_url = "https://demoqa.com"  # исправлено
     browser.config.timeout = 10
-
     browser.config.window_width = 1920
     browser.config.window_height = 1080
 
     yield
 
-
     browser.quit()
+

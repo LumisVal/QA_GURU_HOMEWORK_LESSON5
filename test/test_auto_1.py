@@ -1,55 +1,82 @@
 import pytest
 from selene import browser, by, be, have, command
+from pathlib import Path
 
 def test_fill_and_submit_form():
-    # Подготовка: создаём пустой файл для загрузки
+    # Создаём временный файл для загрузки (абсолютный путь)
     file_name = 'test.png'
-    with open(file_name, 'wb') as f:
+    file_path = str(Path(file_name).resolve())
+    with open(file_path, 'wb') as f:
         f.write(b'')
 
-    # Открыть страницу с формой
-    browser.open('/automation-practice-form')
+    try:
+        # Открыть страницу с формой
+        browser.open('/automation-practice-form')
 
-    # Заполнить имя
-    browser.element('#firstName').type('Leonid')
-    # Заполнить фамилию
-    browser.element('#lastName').type('Gromov')
-    # Заполнить email
-    browser.element('#userEmail').type('test@qaguru.ru')
-    # Выбрать пол (например, Male)
-    browser.element('[for="gender-radio-1"]').click()
-    # Добавим номер телефона
-    browser.element('#userNumber').type('123456789')
-    #Добавим дату рождения через иммитацию кликов
-    browser.element('#dateOfBirthInput').click()
-    browser.element('.react-datepicker__year-select').click()
-    browser.element('[value="2004"]').click()
-    browser.element('.react-datepicker__month-select').click()
-    browser.element('[value="8"]').click()
-    browser.element('.react-datepicker__day--028').click()
+        # Заполнить имя
+        browser.element('#firstName').type('Leonid')
+        # Заполнить фамилию
+        browser.element('#lastName').type('Gromov')
+        # Заполнить email
+        browser.element('#userEmail').type('test@qaguru.ru')
+        # Выбрать пол (Male)
+        browser.element('[for="gender-radio-1"]').click()
+        # Номер телефона (10 цифр)
+        browser.element('#userNumber').type('1234567890')
 
-    # Выбрать хобби (Sports и Reading)
-    browser.element('[for="hobbies-checkbox-1"]').click()
-    browser.element('[for="hobbies-checkbox-2"]').click()
+        # Дата рождения (28 августа 2004)
+        # Упрощённый вариант: прямой ввод (работает на demoqa.com)
+        browser.element('#dateOfBirthInput').type('28 Aug 2004').press_enter()
+        # Альтернатива через селекты (если нужен клик):
+        # browser.element('#dateOfBirthInput').click()
+        # browser.element('.react-datepicker__year-select').click()
+        # browser.element('[value="2004"]').click()
+        # browser.element('.react-datepicker__month-select').click()
+        # browser.element('[value="7"]').click()  # август = 7 (январь = 0)
+        # browser.element('.react-datepicker__day--028').click()
 
-    # Заполнить текущий адрес
-    browser.element('#currentAddress').type('88 Colin P. Kelly Jr. Street.San Francisco')
-    # Загрузка файла
-    browser.element('#uploadPicture').type(file_name)
+        # Выбрать хобби (Sports и Reading)
+        browser.element('[for="hobbies-checkbox-1"]').click()
+        browser.element('[for="hobbies-checkbox-2"]').click()
 
-    # Выбрать штат (например, Rajasthan)
-    browser.element('#state').click()
-    browser.element(by.text('Rajasthan')).click()
+        # Заполнить текущий адрес
+        browser.element('#currentAddress').type('88 Colin P. Kelly Jr. Street.San Francisco')
 
-    # Выбрать город (например, Jaipur)
-    browser.element('#city').click()
-    browser.element(by.text('Jaipur')).click()
+        # Загрузка файла
+        browser.element('#uploadPicture').type(file_path)  # используем абсолютный путь
 
-    # Отправить форму (иногда требуется JS-клик из-за перекрывающей рекламы)
-    browser.element('#submit').perform(command.js.click)
+        # Выбрать штат (Rajasthan)
+        browser.element('#state').click()
+        browser.element(by.text('Rajasthan')).click()
 
-    # Проверить, что появилось модальное окно с подтверждением
-    browser.element('.modal-content').should(be.visible)
-    browser.element('#example-modal-sizes-title-lg').should(
-        have.text('Thanks for submitting the form')
-    )
+        # Выбрать город (Jaipur)
+        browser.element('#city').click()
+        browser.element(by.text('Jaipur')).click()
+
+        # Отправить форму (JS-клик из-за возможной рекламы)
+        browser.element('#submit').perform(command.js.click)
+
+        # Проверить появление модального окна
+        browser.element('.modal-content').should(be.visible)
+        browser.element('#example-modal-sizes-title-lg').should(
+            have.text('Thanks for submitting the form')
+        )
+
+        # Проверить данные в таблице модального окна
+        # Порядок полей: Student Name, Email, Gender, Mobile, Date of Birth, Subjects, Hobbies, Picture, Address, State and City
+        browser.element('.table').all('td').even.should(have.exact_texts(
+            'Leonid Gromov',
+            'test@qaguru.ru',
+            'Male',
+            '1234567890',
+            '28 August,2004',          # формат точно такой, как на странице
+            '',                          # Subjects (мы не заполняли)
+            'Sports, Reading',
+            'test.png',
+            '88 Colin P. Kelly Jr. Street.San Francisco',
+            'Rajasthan Jaipur'
+        ))
+
+    finally:
+        # Удаляем временный файл
+        Path(file_path).unlink(missing_ok=True)
